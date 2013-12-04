@@ -33,6 +33,7 @@ EXT_VARIANT=$3
 MOUNT_POINT=$4
 SIZE=$5
 FC=$6
+LABEL=""
 
 case $EXT_VARIANT in
   ext4) ;;
@@ -44,6 +45,18 @@ if [ -z $MOUNT_POINT ]; then
   exit 2
 fi
 
+case $MOUNT_POINT in
+  "system")
+    LABEL="-L SYSTEM"
+    ;;
+  "data")
+    LABEL="-L USERDATA"
+    ;;
+  "cache")
+    LABEL="-L CACHE"
+    ;;
+esac
+
 if [ -z $SIZE ]; then
   echo "Need size of filesystem"
   exit 2
@@ -53,7 +66,7 @@ if [ -n "$FC" ]; then
     FCOPT="-S $FC"
 fi
 
-MAKE_EXT4FS_CMD="make_ext4fs $ENABLE_SPARSE_IMAGE $FCOPT -l $SIZE -a $MOUNT_POINT $OUTPUT_FILE $SRC_DIR"
+MAKE_EXT4FS_CMD="make_ext4fs $ENABLE_SPARSE_IMAGE $FCOPT -l $SIZE -a $MOUNT_POINT $LABEL $OUTPUT_FILE $SRC_DIR"
 echo $MAKE_EXT4FS_CMD
 $MAKE_EXT4FS_CMD
 if [ $? -ne 0 ]; then
